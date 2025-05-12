@@ -164,6 +164,25 @@ body {
     color: white;
 }
 
+.edit-task {
+    padding: 5px 10px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    background-color: #ffcc00;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: white;
+}
+
+.edit-task:hover {
+    background-color: #ffbb00;
+    box-shadow: 0px 0px 2px #ffbb00;
+    transition: 0.3s;
+    color: white;
+}
+
 .empty {
     display: flex;
     justify-content: center;
@@ -186,6 +205,10 @@ body {
 
 .hidden {
     display: none;
+}
+
+.show {
+    display: block;
 }
 
 .delete-all {

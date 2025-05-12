@@ -11,6 +11,7 @@ function read() {
             data.forEach(curr => {
                 const li = document.createElement("li");
                 li.innerText = `${curr.task[0].toUpperCase()}${curr.task.slice(1)}`;
+                li.id = curr.id; // Set the id attribute to the task's id
                 taskList.appendChild(li);
                 const btns = document.createElement("div");
                 btns.classList.add("btns");
@@ -21,6 +22,12 @@ function read() {
                 i.classList.add("fa-solid", "fa-minus", "fa-xl");
                 checkButton.appendChild(i);
                 btns.appendChild(checkButton);
+                const editTask = document.createElement("button");
+                editTask.classList.add("edit-task");
+                const i1 = document.createElement("i");
+                i1.classList.add("fa-solid", "fa-pen-to-square");
+                editTask.appendChild(i1);
+                btns.appendChild(editTask);
                 const deleteButton = document.createElement("button");
                 deleteButton.classList.add("delete-task");
                 const i2 = document.createElement("i");
@@ -33,10 +40,11 @@ function read() {
                     } else {
                         li.classList.add("mins");
                     }
-
                 });
                 deleteButton.addEventListener("click", () => {
-
+                    if (!confirm("Are you sure you want to delete this task?")) {
+                        return;
+                    }
                     fetch(`https://68219a00259dad2655afc151.mockapi.io/Post/${curr.id}`, {
                         method: 'DELETE',
                     })
@@ -45,7 +53,27 @@ function read() {
                         })
                         .catch(error => console.error('Error deleting task:', error));
                 });
-
+                editTask.addEventListener("click", () => {
+                    let text = prompt("Edit your task", li.innerText);
+                    if (text === null || text === "") {
+                        return;
+                    }
+                    fetch(`https://68219a00259dad2655afc151.mockapi.io/Post/${curr.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            task: text,
+                        }),
+                        headers: {
+                            'Content-type': 'application/json; charset=UTF-8',
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(updatedTask => {
+                            li.innerText = `${updatedTask.task[0].toUpperCase()}${updatedTask.task.slice(1)}`;
+                            li.appendChild(btns); // Re-append the buttons to ensure they remain visible
+                        })
+                        .catch(error => console.error('Error updating task:', error));
+                });
             });
         })
         .catch(error => console.error('Error fetching tasks:', error));
@@ -55,6 +83,7 @@ function addTask() {
         alert("Please enter a task.");
         return;
     }
+
     fetch('https://68219a00259dad2655afc151.mockapi.io/Post', {
         method: 'POST',
         body: JSON.stringify({
@@ -68,6 +97,7 @@ function addTask() {
         .then(newTask => {
             const li = document.createElement("li");
             li.innerText = `${newTask.task[0].toUpperCase()}${newTask.task.slice(1)}`;
+            li.id = newTask.id; // Set the id attribute to the task's id
             taskList.appendChild(li);
             const btns = document.createElement("div");
             btns.classList.add("btns");
@@ -78,6 +108,12 @@ function addTask() {
             i.classList.add("fa-solid", "fa-minus", "fa-xl");
             checkButton.appendChild(i);
             btns.appendChild(checkButton);
+            const editTask = document.createElement("button");
+            editTask.classList.add("edit-task");
+            const i1 = document.createElement("i");
+            i1.classList.add("fa-solid", "fa-pen-to-square");
+            editTask.appendChild(i1);
+            btns.appendChild(editTask);
             const deleteButton = document.createElement("button");
             deleteButton.classList.add("delete-task");
             const i2 = document.createElement("i");
@@ -92,6 +128,9 @@ function addTask() {
                 }
             });
             deleteButton.addEventListener("click", () => {
+                if (!confirm("Are you sure you want to delete this task?")) {
+                    return;
+                }
                 fetch(`https://68219a00259dad2655afc151.mockapi.io/Post/${newTask.id}`, {
                     method: 'DELETE',
                 })
@@ -100,14 +139,51 @@ function addTask() {
                     })
                     .catch(error => console.error('Error deleting task:', error));
             });
+            editTask.addEventListener("click", () => {
+                let text = prompt("Edit your task", li.innerText);
+                if (text === null || text === "") {
+                    return;
+                }
+                fetch(`https://68219a00259dad2655afc151.mockapi.io/Post/${li.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        task: text,
+                    }),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                })
+                    .then(response => response.json())
+                    .then(updatedTask => {
+                        li.innerText = `${updatedTask.task[0].toUpperCase()}${updatedTask.task.slice(1)}`;
+                    })
+                    .catch(error => console.error('Error updating task:', error));
+            });
             taskInput.value = "";
+
         })
         .catch(error => console.error('Error adding task:', error));
 }
 
 
 
+function toggleDeleteAllButton() {
+    fetch('https://68219a00259dad2655afc151.mockapi.io/Post')
+        .then(response => response.json())
+        .then(data => {
+            if (data.length === 0) {
+                deleteAll.classList.add("hidden");
+            } else {
+                deleteAll.classList.remove("hidden");
+            }
+        })
+        .catch(error => console.error('Error checking tasks:', error));
+}
+
 deleteAll.addEventListener("click", () => {
+    if (!confirm("Are you sure you want to delete all tasks?")) {
+        return;
+    }
     fetch('https://68219a00259dad2655afc151.mockapi.io/Post')
         .then(response => response.json())
         .then(data => {
@@ -121,4 +197,9 @@ deleteAll.addEventListener("click", () => {
                     .catch(error => console.error('Error deleting all tasks:', error)));
         })
         .catch(error => console.error('Error fetching tasks for deletion:', error));
+    document.addEventListener("DOMContentLoaded", toggleDeleteAllButton);
+
 });
+
+document.addEventListener("DOMContentLoaded", toggleDeleteAllButton);
+taskInput.addEventListener("input", toggleDeleteAllButton);
