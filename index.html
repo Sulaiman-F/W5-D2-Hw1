@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/42f2b55299.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <div class="head">
+        <h1>Welcome to ( ToDoList )</h1>
+        <div class="add-task">
+            <input id="task-input" type="text" placeholder="Add a new task" required>
+            <button id="add-task-button" onclick="addTask()">Add Task</button>
+        </div>
+    </div>
+    <div class="task-list-container">
+        <div class="task-list">
+            <h2>Task List</h2>
+            <ul id="task-list-items" class="task-list-items">
+            </ul>
+            <button id="delete-all" class="delete-all">Delete all</button>
+        </div>
+    </div>
+</body>
+<script src="./main.js"></script>
+
+</html>
